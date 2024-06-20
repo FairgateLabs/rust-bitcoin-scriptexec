@@ -5,6 +5,7 @@ edition = "2021"
 description = "Bitcoin Script interpreter/executor"
 authors = ["Steven Roose <steven@roose.io>"]
 license = "CC0-1.0"
+repository = "https://github.com/FairgateLabs/rust-bitcoin-scriptexec"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -21,8 +22,9 @@ cli = ["json", "clap"]
 wasm = ["json", "wasm-bindgen", "serde-wasm-bindgen", "console_error_panic_hook", "getrandom/js"]
 
 [dependencies]
-# bitcoin = "0.31.0"
-bitcoin = { git = "https://github.com/rust-bitcoin/rust-bitcoin", branch = "bitvm" }
+bitcoin = { version = "0.32.1" }
+bitcoin-script = { git = "https://github.com/FairgateLabs/rust-bitcoin-script", branch = "bitvmx"}
+opcode-utils = { git = "https://github.com/FairgateLabs/opcode-utils" }
 lazy_static = "1.4.0"
 
 # cli
@@ -37,26 +39,4 @@ console_error_panic_hook = { version = "0.1.7", optional = true }
 # I think we need to mention this for secp256k1-sys to work
 getrandom = { version = "0.2", optional = true }
 
-[patch.crates-io.base58check]
-git = "https://github.com/rust-bitcoin/rust-bitcoin"
-branch = "bitvm"
-
-[patch.crates-io.bitcoin]
-git = "https://github.com/rust-bitcoin/rust-bitcoin"
-branch = "bitvm"
-
-[patch.crates-io.bitcoin_hashes]
-git = "https://github.com/rust-bitcoin/rust-bitcoin"
-branch = "bitvm"
-
-[patch.crates-io.bitcoin-internals]
-git = "https://github.com/rust-bitcoin/rust-bitcoin"
-branch = "bitvm"
-
-[patch.crates-io.bitcoin-io]
-git = "https://github.com/rust-bitcoin/rust-bitcoin"
-branch = "bitvm"
-
-[patch.crates-io.bitcoin-units]
-git = "https://github.com/rust-bitcoin/rust-bitcoin"
-branch = "bitvm"
+hex-conservative = "0.2.1"

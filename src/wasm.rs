@@ -5,13 +5,12 @@ use bitcoin::{ScriptBuf, Transaction};
 use serde_json::json;
 use wasm_bindgen::prelude::*;
 
-use crate::*;
+use crate::{parse_asm, *};
 
 /// Compile ASM into script hex.
 #[wasm_bindgen]
 pub fn script_asm_to_hex(script_asm: &str) -> Result<String, JsValue> {
-    let script =
-        ScriptBuf::parse_asm(script_asm).map_err(|e| format!("error parsing script: {:?}", e))?;
+    let script = parse_asm(script_asm).map_err(|e| format!("error parsing script: {:?}", e))?;
     Ok(script.as_bytes().as_hex().to_string())
 }
 

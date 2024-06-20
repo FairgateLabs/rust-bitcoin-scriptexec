@@ -34,6 +34,15 @@ mod wasm;
 mod data_structures;
 pub use data_structures::Stack;
 
+mod parse_utils;
+pub use parse_utils::*;
+
+mod timelock_utils;
+pub use timelock_utils::*;
+
+mod script_exec;
+pub use script_exec::*;
+
 /// Maximum number of non-push operations per script
 const MAX_OPS_PER_SCRIPT: usize = 201;
 
@@ -373,7 +382,7 @@ impl Exec {
             None => return false,
         };
 
-        let lock_time = match LockTime::from_num(sequence) {
+        let lock_time = match from_num(sequence) {
             Some(lt) => lt,
             None => return false,
         };
@@ -1010,12 +1019,4 @@ impl Exec {
         self.stats.opcode_count = self.opcode_count;
         self.stats.validation_weight = self.validation_weight;
     }
-}
-
-fn read_scriptint(item: &[u8], size: usize, minimal: bool) -> Result<i64, ExecError> {
-    script::read_scriptint_size(item, size, minimal).map_err(|e| match e {
-        script::ScriptIntError::NonMinimalPush => ExecError::MinimalData,
-        // only possible if size is 4 or lower
-        script::ScriptIntError::NumericOverflow => ExecError::ScriptIntNumericOverflow,
-    })
 }

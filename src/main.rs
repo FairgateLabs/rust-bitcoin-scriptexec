@@ -5,10 +5,14 @@ use std::path::PathBuf;
 use bitcoin::hashes::Hash;
 use bitcoin::hex::DisplayHex;
 use bitcoin::taproot::TapLeafHash;
-use bitcoin::{ScriptBuf, Transaction};
+use bitcoin::Transaction;
 use clap::Parser;
 
 use bitcoin_scriptexec::*;
+
+use crate::parse_utils::parse_asm;
+
+mod parse_utils;
 
 #[derive(Parser)]
 #[command(author = "Steven Roose <steven@roose.io>", version, about)]
@@ -43,7 +47,7 @@ fn inner_main() -> Result<(), String> {
     let args = Args::parse();
 
     let script_asm = std::fs::read_to_string(args.script_path).expect("error reading script file");
-    let script = ScriptBuf::parse_asm(&script_asm).expect("error parsing script");
+    let script = parse_asm(&script_asm).expect("error parsing script");
     println!("Script in hex: {}", script.as_bytes().to_lower_hex_string());
     println!("Script size: {} bytes", script.as_bytes().len());
 

@@ -1,10 +1,11 @@
-use crate::{read_scriptint, ExecError};
+use crate::{read_scriptint, scriptint_vec, ExecError};
 use alloc::rc::Rc;
-use bitcoin::script;
 use core::cell::RefCell;
 use core::cmp::PartialEq;
 use core::slice::Iter;
+use std::fmt;
 use std::iter::Map;
+use bitcoin::hex::DisplayHex;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum StackEntry {
@@ -48,7 +49,7 @@ impl Stack {
     pub fn topstr(&self, offset: isize) -> Result<Vec<u8>, ExecError> {
         let entry = self.top(offset)?;
         match entry {
-            StackEntry::Num(v) => Ok(script::scriptint_vec(*v)),
+            StackEntry::Num(v) => Ok(scriptint_vec(*v)),
             StackEntry::StrRef(v) => Ok(v.borrow().to_vec()),
         }
     }
@@ -102,7 +103,7 @@ impl Stack {
     pub fn popstr(&mut self) -> Result<Vec<u8>, ExecError> {
         let entry = self.0.pop().ok_or(ExecError::InvalidStackOperation)?;
         match entry {
-            StackEntry::Num(v) => Ok(script::scriptint_vec(v)),
+            StackEntry::Num(v) => Ok(scriptint_vec(v)),
             StackEntry::StrRef(v) => Ok(v.borrow().to_vec()),
         }
     }
@@ -131,14 +132,14 @@ impl Stack {
 
     pub fn iter_str(&self) -> Map<Iter<StackEntry>, fn(&StackEntry) -> Vec<u8>> {
         self.0.iter().map(|v| match v {
-            StackEntry::Num(v) => script::scriptint_vec(*v),
+            StackEntry::Num(v) => scriptint_vec(*v),
             StackEntry::StrRef(v) => v.borrow().to_vec(),
         })
     }
 
     pub fn get(&self, index: usize) -> Vec<u8> {
         match &self.0[index] {
-            StackEntry::Num(v) => script::scriptint_vec(*v),
+            StackEntry::Num(v) => scriptint_vec(*v),
             StackEntry::StrRef(v) => v.borrow().to_vec(),
         }
     }
@@ -147,5 +148,44 @@ impl Stack {
 impl Default for Stack {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+/// A wrapper for the stack types to print them better.
+pub struct FmtStack(Stack);
+
+impl From<Stack> for FmtStack {
+    fn from(stack: Stack) -> Self {
+        FmtStack(stack)
+    }
+}
+
+impl fmt::Display for FmtStack {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut iter = self.0.iter_str().enumerate().peekable();
+        write!(f, "\n0:\t\t ")?;
+        while let Some((index, item)) = iter.next() {
+            write!(f, "0x{:8}", item.as_hex())?;
+            if iter.peek().is_some() {
+                if (index + 1) % f.width().unwrap() == 0 {
+                    write!(f, "\n{}:\t\t", index + 1)?;
+                }
+                write!(f, " ")?;
+            }
+        }
+        Ok(())
+    }
+}
+
+impl FmtStack {
+    pub fn len(&self) -> usize { self.0.len() }
+
+    pub fn get(&self, index: usize) -> Vec<u8> { self.0.get(index) }
+}
+
+impl fmt::Debug for FmtStack {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self)?;
+        Ok(())
     }
 }
