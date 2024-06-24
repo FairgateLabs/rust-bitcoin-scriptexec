@@ -24,7 +24,7 @@ wasm = ["json", "wasm-bindgen", "serde-wasm-bindgen", "console_error_panic_hook"
 [dependencies]
 bitcoin = { version = "0.32.1" }
 bitcoin-script = { git = "https://github.com/FairgateLabs/rust-bitcoin-script", branch = "bitvmx"}
-opcode-utils = { git = "https://github.com/FairgateLabs/opcode-utils" }
+bitcoin-opcode-utils = { git = "https://github.com/FairgateLabs/rust-bitcoin-opcode-utils" }
 lazy_static = "1.4.0"
 
 # cli

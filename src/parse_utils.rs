@@ -2,7 +2,7 @@ use bitcoin::{opcodes::{self, all::OP_PUSHBYTES_0}, script::{Builder, PushBytes}
 use hex_conservative::HexToBytesIter;
 use core::str::FromStr;
 
-use opcode_utils::{from_str, is_push_bytes, is_push_data, OP_PUSHDATA1_CODE};
+use bitcoin_opcode_utils::{from_str, is_push_bytes, is_push_data, OP_PUSHDATA1_CODE};
 
 pub fn parse_asm(asm: &str) -> Result<ScriptBuf, ParseAsmError> {
     fn err(position: (usize, usize), kind: AsmParseErrorKind) -> ParseAsmError {
